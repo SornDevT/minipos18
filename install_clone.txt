@@ -1,0 +1,6 @@
+
+1. git clone https://github.com/SornDevT/minipos18.git
+2. ແກ້ໄຂໄຟລ໌ .env
+3. run: npm install
+4. run: composer install
+5. run: php artisan key:generate
