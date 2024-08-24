@@ -2,6 +2,8 @@
    
 <!-- Menu -->
 
+
+
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
 
   
@@ -22,33 +24,34 @@
 
 <div class="menu-inner-shadow"></div>
 
-
+<!-- {{ $route }} -->
 
 <ul class="menu-inner py-1">
 
   <!-- Dashboards -->
-  <li class="menu-item">
+
+  <li class="menu-item" :class="$route.path=='/store'?'active':''" >
     <router-link to="/store" class="menu-link">
         <i class='menu-icon bx bx-store'></i>
       <div class="text-truncate" data-i18n="Dashboards">ສະຕ໋ອກສິນຄ້າ</div>
     </router-link>
   </li>
 
-  <li class="menu-item">
+  <li class="menu-item" :class="$route.path=='/pos'?'active':''">
     <router-link to="/pos" class="menu-link">
       <i class='bx bx-cart menu-icon '></i>
       <div class="text-truncate" data-i18n="Dashboards">ຂາຍ POS</div>
     </router-link>
   </li>
 
-  <li class="menu-item">
+  <li class="menu-item" :class="$route.path=='/transection'?'active':''">
     <router-link to="/transection" class="menu-link">
       <i class='bx bx-transfer-alt menu-icon'></i>
       <div class="text-truncate" data-i18n="Dashboards">ການເຄື່ອນໄຫວ</div>
     </router-link>
   </li>
 
-  <li class="menu-item">
+  <li class="menu-item"  :class="$route.path=='/report'?'active':''">
     <router-link to="/report" class="menu-link">
       <i class='bx bx-bar-chart-alt-2 menu-icon'></i>
       <div class="text-truncate" data-i18n="Dashboards">ລາຍງານ</div>

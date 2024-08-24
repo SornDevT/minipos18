@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('transections', function (Blueprint $table) {
             $table->id();
+            $table->string('tran_id');
+            $table->string('tran_type');
+            $table->integer('product_id');
+            $table->integer('qty');
+            $table->integer('price');
+            $table->string('detail');
             $table->timestamps();
         });
     }

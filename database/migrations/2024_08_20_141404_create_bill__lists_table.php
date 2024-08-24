@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('bill__lists', function (Blueprint $table) {
             $table->id();
+            $table->string('bill_id');
+            $table->string('name');
+            $table->integer('qty');
+            $table->integer('price');
             $table->timestamps();
         });
     }

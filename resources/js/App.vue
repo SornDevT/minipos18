@@ -8,7 +8,7 @@
     
     
 
-    <Menu />
+    <Menu v-if="store.get_token" />
 
 
     
@@ -25,7 +25,7 @@
 
 
 
-<nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
+<nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar" v-if="store.get_token">
   
 
   
@@ -158,12 +158,12 @@
 
           
           
-
+      Token: {{ store.get_token }}
 <!-- Footer -->
-<footer class="content-footer footer bg-footer-theme">
+<footer class="content-footer footer bg-footer-theme" v-if="store.get_token">
   <div class="container-xxl">
     <div class="footer-container d-flex align-items-center justify-content-between py-4 flex-md-row flex-column">
-      <div class="text-body">
+      <div class="text-body"> 
         © , made with ❤️ by <a href="https://themeselection.com" target="_blank" class="footer-link">ThemeSelection</a>
       </div>
       <div class="d-none d-lg-inline-block">
@@ -202,8 +202,17 @@
 
 </template>
 <script>
+import { useStore } from './Store/auth'
 export default {
-    
+    setup(){
+      const store = useStore();
+      return { store }
+    },
+    data() {
+      return {
+        url: window.location.origin
+      }
+    },
 }
 </script>
 <style lang="">
