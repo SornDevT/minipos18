@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use JWTAuth;
 
 class UserController extends Controller
 {
@@ -16,15 +17,27 @@ class UserController extends Controller
 
         try {
 
-            $user = new User([
-                'name' => $request->form_user_name,
-                'email' => $request->form_user_email,
-                'password' => hash::make($request->form_password),
-            ]);
-            $user->save();
+            // ກວດຊອບອີເມວລ໌ ຊ້ຳກັນ
+            $check_email = User::where('email',$request->form_user_email);
+            
+            if($check_email->count()){
 
-            $success = true;
-            $message = 'ບັນທຶກຂໍ້ມູນສຳເລັດ!';
+                $success = false;
+                $message = 'ອີເມວລ໌ນີ້:'.$request->form_user_email.' ໄດ້ຖຶກລົງທະບຽນແລ້ວ!';
+
+            } else {
+                $user = new User([
+                    'name' => $request->form_user_name,
+                    'email' => $request->form_user_email,
+                    'password' => hash::make($request->form_password),
+                ]);
+                $user->save();
+    
+                $success = true;
+                $message = 'ບັນທຶກຂໍ້ມູນສຳເລັດ!';
+            }
+
+            
 
         } catch (\Illuminate\Database\QueryException $ex) {
 
@@ -39,5 +52,65 @@ class UserController extends Controller
 
         return response()->json($response);
 
+    }
+
+    public function login(Request $request){
+
+        $user_login = [
+            'email' => $request->login_email,
+            'password' => $request->login_password
+        ];
+        
+        if($request->login_remember_me == 'true'){
+            JWTAuth::factory()->setTTL(10080);
+        } 
+
+       
+        $token = JWTAuth::attempt($user_login);
+        $user_data = Auth::user();
+
+        if($token){
+
+            $response = [
+                'success' => true,
+                'message' => 'ສຳເລັດ',
+                'user_data' => $user_data,
+                'token' => $token
+            ];
+    
+            return response()->json($response);
+
+        } else {
+
+            $response = [
+                'success' => false,
+                'message' => 'ອີເມວລ໌ ຫຼື ລະຫັດຜ່ານບໍ່ຖຶກຕ້ອງ!'
+            ];
+    
+            return response()->json($response);
+
+        }
+
+    }
+
+    public function logout(){
+        // return 'logout';
+
+        $token = JWTAuth::getToken();
+        $invalidate = JWTAuth::invalidate($token);
+
+        if($invalidate){
+            $response = [
+                'success' => true,
+                'message' => 'ອອກຈາກລະບົບສຳເລັດ!'
+            ];
+        } else {
+            $response = [
+                'success' => false,
+                'message' => 'ອກກຈາກລະບົບ ບໍ່ສຳເລັດ!'
+            ];
+        }
+
+        return response()->json($response);
     }
 }

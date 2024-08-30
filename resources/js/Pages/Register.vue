@@ -88,6 +88,15 @@ export default {
                         form_user_email: this.user_email,
                         form_password: this.password
                     }).then((res)=>{
+                      
+                        if(res.data.success){
+                          // ລົງທະບຽນສຳເລັດ
+                          this.text_error = ''
+                          // ໄປໜ້າ login
+                          this.$router.push('/login');
+                        } else {
+                          this.text_error = res.data.message
+                        }
                         console.log(res);
                     }).catch((err)=>{
                         console.log(err)

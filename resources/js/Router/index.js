@@ -20,7 +20,7 @@ const authMiddleware = (to, from , next) => {
     const store = useStore();
 
     if(token){
-        // ຖ້າມີ token ໃນ localstorage
+        // ຖ້າມີ token ໃນ localstorage ເກັບໄວ້ໃນ pinia
         store.set_token(token);
         store.set_user(user);
         next();
