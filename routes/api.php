@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 // })->middleware('auth:sanctum');
 
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\StoreController;
 
 
 Route::post('register',[UserController::class,'register']);
@@ -18,4 +19,10 @@ Route::post('login',[UserController::class,'login']);
 Route::group(["middleware"=>["auth:api"]],
     function(){
         Route::get('logout',[UserController::class,'logout']);
+    });
+
+
+Route::group(["middleware"=>["auth:api"]],
+    function(){
+        Route::post('store/add',[StoreController::class,'add']);
     });

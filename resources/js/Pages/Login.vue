@@ -27,8 +27,11 @@
             <div class="mb-6 form-password-toggle">
               <label class="form-label fs-6" for="password">ລະຫັດຜ່ານ:</label>
               <div class="input-group input-group-merge">
-                <input type="password" id="password" class="form-control" v-model="password" name="password" placeholder="···" >
-                <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                <input :type="show_pass" id="password" class="form-control" v-model="password" name="password" placeholder="···" @keyup.enter="Login()" >
+                <span class="input-group-text cursor-pointer" @click=" show_pass=='password'?show_pass='text':show_pass='password' ">
+                  <i class="bx bx-hide" v-if="show_pass=='password'"></i>
+                  <i class="bx bx-show" v-if="show_pass=='text'"></i>
+                </span>
               </div>
             </div>
             <div class="mb-8">
@@ -74,7 +77,7 @@ export default {
         text_error:'',
         check_email_text:'',
         check_password_text:'',
-        show_pass:'',
+        show_pass:'password',
         remember_me:false
       }
     },
