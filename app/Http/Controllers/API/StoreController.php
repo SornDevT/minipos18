@@ -43,4 +43,27 @@ class StoreController extends Controller
         return response()->json($response);
 
     }
+
+    public function index(){
+
+        // $store = Store::orderBy('id','asc')->get();
+        // return $store;
+        $PerPage = \Request::get('perpage');
+        $Sort = \Request::get('sort');
+        $search = \Request::get('search');
+
+        $store = Store::orderBy('id',$Sort)
+        ->where(
+            function($query) use ($search){
+                $query->where('name','LIKE',"%{$search}%")
+                ->orWhere('price_buy','LIKE',"%{$search}%");
+            }
+        )
+        ->paginate($PerPage)
+        ->toArray();
+
+        return array_reverse($store);
+
+
+    }
 }
