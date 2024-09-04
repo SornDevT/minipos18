@@ -4,7 +4,7 @@
   <h5 class="card-header">ລາຍການ ສະຕ໋ອກສິນຄ້າ</h5>
   <div class="card-body">
 
-    {{ FormStore }}
+    <!-- {{ FormStore }} -->
 
     <div v-if="ShowForm">
         <div class=" d-flex justify-content-end">
@@ -19,12 +19,12 @@
             <input type="text" class="form-control mb-2" v-model="FormStore.name"  placeholder="...." >
 
             <label class="form-label fs-6">ຈຳນວນ:</label>
-            <input type="text" class="form-control" v-model="FormStore.qty"  placeholder="...." >
+            <cleave :options="options" class="form-control" v-model="FormStore.qty"  placeholder="...." />
             <div class="row mt-2 mb-2">
                 <div class="col-md-6">
                     <label>ລາຄາຊື້:</label>
                     <div class="input-group">
-                    <input type="text" class="form-control" v-model="FormStore.price_buy" placeholder="..." >
+                    <cleave :options="options" class="form-control" v-model="FormStore.price_buy" placeholder="..." />
                     <span class="input-group-text" id="basic-addon11">ກີບ</span>
                     </div>
 
@@ -33,7 +33,7 @@
 
                     <label>ລາຄາຂາຍ:</label>
                     <div class="input-group">
-                    <input type="text" class="form-control" v-model="FormStore.price_sell" placeholder="..." >
+                    <cleave :options="options" class="form-control" v-model="FormStore.price_sell" placeholder="..." />
                     <span class="input-group-text" id="basic-addon11">ກີບ</span>
                     </div>
 
@@ -76,8 +76,8 @@
             <th>ຮູບ</th>
             <th>ຊື່ສິນຄ້າ</th>
             <th>ຈຳນວນ</th>
-            <th>ລາຄາຊື້</th>
-            <th>ຈັດການ</th>
+            <th class="text-center">ລາຄາຊື້</th>
+            <th class=" text-center">ຈັດການ</th>
           </tr>
         </thead>
         <tbody>
@@ -87,13 +87,13 @@
             <td>{{ item.image }}</td>
             <td>{{ item.name }}</td>
             <td>{{ item.qty }}</td>
-            <td>{{ item.price_buy }}</td>
-            <td>
+            <td class="text-end">{{ formatPrice(item.price_buy) }}</td>
+            <td class="text-center">
               <div class="dropdown">
                 <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown" aria-expanded="false"><i class="bx bx-dots-vertical-rounded"></i></button>
                 <div class="dropdown-menu" style="">
-                  <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-edit-alt me-1"></i> Edit</a>
-                  <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-trash me-1"></i> Delete</a>
+                  <a class="dropdown-item" href="javascript:void(0);" @click="EditStore(item.id)"><i class="bx bx-edit-alt me-1"></i> ແກ້ໄຂ</a>
+                  <a class="dropdown-item" href="javascript:void(0);" @click="DelStore(item.id)" ><i class="bx bx-trash me-1"></i> ລຶບ</a>
                 </div>
               </div>
             </td>
@@ -102,6 +102,8 @@
         </tbody>
       </table>
       <Paginatiom :pagination="StoreData" :offset="4" @paginate="GetStore($event)" />
+
+      <button @click="showAlert">Hello world</button>
     </div>
 
 
@@ -119,6 +121,7 @@ export default {
     },
     data() {
         return {
+            EditID:'',
             Search:'',
             Sort:'desc',
             PerPage:5,
@@ -132,6 +135,16 @@ export default {
                 price_sell:''
             },
             StoreData:[],
+            options: {
+                  numeral: true,
+                  numeralPositiveOnly: true,
+                  noImmediatePrefix: true,
+                  rawValueTrimPrefix: true,
+                  numeralIntegerScale: 10,
+                  numeralDecimalScale: 2,
+                  numeralDecimalMark: '.',
+                  delimiter: ','
+                }
         }
     },
     computed:{
@@ -144,6 +157,19 @@ export default {
         }
     },
     methods:{
+        formatPrice(value) {
+            let val = (value / 1).toFixed(0).replace(",", ".");
+            return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        },
+        showAlert() {
+        // Use sweetalert2
+        this.$swal({
+            title: "ບັນທຶກຂໍ້ມູນ ສຳເລັດ",
+            icon: "error",
+            showConfirmButton:false,
+            timer: 3500
+            });
+        },
         ChangeSort(){
             if(this.Sort == 'desc'){
                 this.Sort = 'asc';
@@ -166,11 +192,76 @@ export default {
         CancelStore(){
             this.ShowForm = false;
         },
-        SaveStore(){
+        EditStore(id){
+            // console.log(id)
 
+            this.FormType = false;
+            this.EditID = id;
+
+            axios.get(`api/store/edit/${id}`,{ headers:{ Authorization: 'Bearer '+this.store.get_token }}).then((res) => {
+                console.log(res.data);
+                this.FormStore = res.data;
+                this.ShowForm = true;
+                
+            }).catch((error)=>{
+                console.log(error);
+            })
+
+
+        },
+        DelStore(id){
+
+            this.$swal({
+                    title: "ທ່ານແນ່ໃຈບໍ່?",
+                    text: "ທີ່ຈະລຶບຂໍ້ມູນນີ້!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "ຕົກລົງ!",
+                    cancelButtonText: "ຍົກເລີກ"
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+
+
+                        axios.delete(`api/store/delete/${id}`,{ headers:{ Authorization: 'Bearer '+this.store.get_token }}).then((res)=>{
+                            if(res.data.success){   
+                                this.$swal({
+                                    title: "ການລຶບຂໍ້ມູນ!",
+                                    text: res.data.message,
+                                    icon: "success",
+                                    showConfirmButton:false,
+                                    timer: 3500
+                                });
+
+                                this.GetStore();
+                            } else {
+                                this.$swal({
+                                    title: res.data.message,
+                                    icon: "error",
+                                    showConfirmButton:false,
+                                    timer: 3500
+                                });
+                            }
+                        }).catch((error)=>{
+                            console.log(error)
+                        })
+                        
+                        
+                        
+                    }
+            });
+
+
+            
+
+
+        },
+        SaveStore(){
+                // console.log('aaaaa')
                 if(this.FormType){
                     // add new data
-
+                   
                     axios.post('api/store/add',this.FormStore, { headers:{ Authorization: 'Bearer '+this.store.get_token }}).then((res)=>{
 
                         if(res.data.success){
@@ -187,9 +278,26 @@ export default {
 
                             this.GetStore();
 
-                            console.log('Save Success!');
+                            this.$swal({
+                                position: 'top-end',
+                                toast:true,
+                                title: res.data.message,
+                                icon: "success",
+                                showConfirmButton:false,
+                                timer: 2500
+                            });
+
+                            // console.log('Save Success!');
                         } else {
-                            console.log(res.data.message)
+
+                            this.$swal({
+                                title: res.data.message,
+                                icon: "error",
+                                showConfirmButton:false,
+                                timer: 3500
+                            });
+
+                            // console.log(res.data.message)
                         }
 
                     }).catch((error)=>{
@@ -197,9 +305,51 @@ export default {
                     })
 
                 } else {
+                    // console.log('update')
                     // update data
+                    axios.post(`api/store/update/${this.EditID}`,this.FormStore, { headers:{ Authorization: 'Bearer '+this.store.get_token }}).then((res)=>{
 
+                        if(res.data.success){
 
+                            // clear form 
+                            this.FormStore.name = '';
+                            this.FormStore.image = '';
+                            this.FormStore.qty = '';
+                            this.FormStore.price_buy = '';
+                            this.FormStore.price_sell = '';
+
+                            // show list data
+                            this.ShowForm = false;
+
+                            this.GetStore();
+
+                            this.$swal({
+                                position: 'top-end',
+                                toast:true,
+                                title: res.data.message,
+                                icon: "success",
+                                showConfirmButton:false,
+                                timer: 2500
+                            });
+
+                            // console.log('update Success!');
+                        } else {
+
+                            this.$swal({
+                                title: res.data.message,
+                                icon: "error",
+                                showConfirmButton:false,
+                                timer: 3500
+                            });
+
+                            // console.log(res.data.message)
+                        }
+
+                        }).catch((error)=>{
+                        console.log(error)
+                        })
+
+                               
                 }
         },
         GetStore(page){
