@@ -4,7 +4,7 @@
   <h5 class="card-header">ລາຍການ ສະຕ໋ອກສິນຄ້າ</h5>
   <div class="card-body">
 
-    <!-- {{ FormStore }} -->
+    {{ FormStore }}
 
     <div v-if="ShowForm">
         <div class=" d-flex justify-content-end">
@@ -12,7 +12,16 @@
             <button type="button" class="btn btn-danger" @click="CancelStore()">ຍົກເລີກ</button>
         </div>
         <div class="row">
-            <div class="col-md-4">Image</div>
+            <div class="col-md-4 text-center" style=" position: relative ">
+
+                <button type="button" @click="remove_img()" class="btn rounded-pill btn-icon btn-danger bt_rm_img" v-if="FormStore.image">
+                    <i class='bx bx-x fs-4'></i>
+                </button>
+
+                <img :src="Image_preview" @click="$refs.img_store.click()" class=" cursor-pointer rounded" style=" width:60%; " >
+
+                <input type="file" style=" display:none;" @change="onSelect($event)" ref="img_store" >
+            </div>
             <div class="col-md-8">
                 <div>
             <label class="form-label fs-6">ຊື່ສິນຄ້າ:</label>
@@ -73,7 +82,7 @@
         <thead>
           <tr>
             <th>ID</th>
-            <th>ຮູບ</th>
+            <th width="110">ຮູບ</th>
             <th>ຊື່ສິນຄ້າ</th>
             <th>ຈຳນວນ</th>
             <th class="text-center">ລາຄາຊື້</th>
@@ -84,7 +93,12 @@
 
           <tr v-for="item in StoreData.data" :key="item.id">
             <td>{{ item.id }}</td>
-            <td>{{ item.image }}</td>
+            <td class="text-center">
+                
+                <!-- {{ item.image }} -->
+                <img :src="url + '/assets/img/' + item.image" v-if="item.image" class=" rounded " style="width:60px" >
+                <img :src="url + '/assets/img/no-img.jpg'" v-else class=" rounded " style="width:60px" >
+            </td>
             <td>{{ item.name }}</td>
             <td>{{ item.qty }}</td>
             <td class="text-end">{{ formatPrice(item.price_buy) }}</td>
@@ -121,6 +135,8 @@ export default {
     },
     data() {
         return {
+            Image_preview: window.location.origin+'/assets/img/upload-img.jpg',
+            url: window.location.origin,
             EditID:'',
             Search:'',
             Sort:'desc',
@@ -157,6 +173,19 @@ export default {
         }
     },
     methods:{
+        remove_img(){
+            this.FormStore.image = '';
+            this.Image_preview = window.location.origin+'/assets/img/upload-img.jpg';
+        },
+        onSelect(event){
+            // console.log(event
+            this.FormStore.image = event.target.files[0]
+            let reader = new FileReader()
+            reader.readAsDataURL(this.FormStore.image)
+            reader.addEventListener("load", function(){
+                this.Image_preview = reader.result
+            }.bind(this,false));
+        },
         formatPrice(value) {
             let val = (value / 1).toFixed(0).replace(",", ".");
             return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -188,6 +217,7 @@ export default {
             this.FormStore.qty = '';
             this.FormStore.price_buy = '';
             this.FormStore.price_sell = '';
+            this.Image_preview = window.location.origin+'/assets/img/upload-img.jpg';
         },
         CancelStore(){
             this.ShowForm = false;
@@ -202,6 +232,13 @@ export default {
                 console.log(res.data);
                 this.FormStore = res.data;
                 this.ShowForm = true;
+
+                if(res.data.image){
+                    this.Image_preview= this.url + '/assets/img/' + res.data.image;
+                } else {
+                    this.Image_preview= this.url + '/assets/img/upload-img.jpg';
+                }
+
                 
             }).catch((error)=>{
                 console.log(error);
@@ -262,7 +299,7 @@ export default {
                 if(this.FormType){
                     // add new data
                    
-                    axios.post('api/store/add',this.FormStore, { headers:{ Authorization: 'Bearer '+this.store.get_token }}).then((res)=>{
+                    axios.post('api/store/add',this.FormStore, { headers:{ "Content-Type":"multipart/form-data", Authorization: 'Bearer '+this.store.get_token }}).then((res)=>{
 
                         if(res.data.success){
 
@@ -307,7 +344,7 @@ export default {
                 } else {
                     // console.log('update')
                     // update data
-                    axios.post(`api/store/update/${this.EditID}`,this.FormStore, { headers:{ Authorization: 'Bearer '+this.store.get_token }}).then((res)=>{
+                    axios.post(`api/store/update/${this.EditID}`,this.FormStore, { headers:{ "Content-Type":"multipart/form-data", Authorization: 'Bearer '+this.store.get_token }}).then((res)=>{
 
                         if(res.data.success){
 
@@ -372,6 +409,11 @@ export default {
     }
 }
 </script>
-<style lang="">
-    
+<style >
+
+    .bt_rm_img {
+        position: absolute;
+        top: 0px;
+        right: 10px;
+    }
 </style>
