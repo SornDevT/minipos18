@@ -158,7 +158,7 @@
 
           
           
-      Token: {{ store.get_token }}
+      <!-- Token: {{ store.get_token }} -->
 <!-- Footer -->
 <footer class="content-footer footer bg-footer-theme" v-if="store.get_token">
   <div class="container-xxl">
