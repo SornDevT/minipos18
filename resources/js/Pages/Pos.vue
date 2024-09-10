@@ -211,6 +211,13 @@ export default {
         }
     },
     methods:{
+        async openLink(link){
+            const response = await fetch(`${link}`,{ headers:{ Authorization: 'Bearer '+ this.store.get_token}});
+            const html = await response.text();
+            const blob = new Blob([html],{ type: "text/html"});
+            const blobUrl = URL.createObjectURL(blob);
+            window.open(blobUrl, "_blank");
+        },
         ComfirmPay(){
 
             axios.post('api/transection/add',{
@@ -229,6 +236,8 @@ export default {
                     this.GetStore();
 
                     $('#dialog_pay').modal('hide');
+
+                    this.openLink(window.location.origin+"/api/bills/print/"+res.data.bill_id);
 
                     this.$swal({
                                 position: 'top-end',
@@ -287,20 +296,44 @@ export default {
             let old_item = this.ListOrder.find((i)=>i.id == id);
             // console.log(item)
 
-            if(old_item){
+            if(item.qty>0){
 
-                    old_item.qty++;
+                    if(old_item){
+                                if(item.qty - old_item.qty>0){
 
-            } else {
+                                    old_item.qty++;
 
-                this.ListOrder.push({
-                    id: item.id,
-                    name: item.name,
-                    image:item.image,
-                    price: item.price_sell,
-                    qty: 1
-                });
+                                } else {
+                                    this.$swal({
+                                        title: "ສິນຄ້າໝົດໃນສະຕ໋ອກ!",
+                                        icon: "error",
+                                        showConfirmButton:false,
+                                        timer: 3500
+                                    });
+                                }
+                        } else {
+
+                                this.ListOrder.push({
+                                id: item.id,
+                                name: item.name,
+                                image:item.image,
+                                price: item.price_sell,
+                                qty: 1
+                                });
+                        }
+
+
+            } else{
+                this.$swal({
+                                title: "ສິນຄ້າໝົດໃນສະຕ໋ອກ!",
+                                icon: "error",
+                                showConfirmButton:false,
+                                timer: 3500
+                            });
             }
+
+
+            
 
             
         },

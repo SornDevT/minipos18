@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\StoreController;
 use App\Http\Controllers\API\TransectionController;
+use App\Http\Controllers\API\BillController;
 
 
 
@@ -35,9 +36,14 @@ Route::group(["middleware"=>["auth:api"]],
 
     Route::group(["middleware"=>["auth:api"]],
     function(){
-        // Route::get('transection',[TransectionController::class,'index']);
+        Route::post('transection',[TransectionController::class,'index']);
         // Route::get('transection/edit/{id}',[TransectionController::class,'edit']);
         Route::post('transection/add',[TransectionController::class,'add']);
         // Route::post('transection/update/{id}',[TransectionController::class,'update']);
         // Route::delete('transection/delete/{id}',[TransectionController::class,'delete']);
+    });
+
+    Route::group(["middleware"=>["auth:api"]],
+    function(){
+        Route::get('bills/print/{id}',[BillController::class,'print_bill']);
     });
